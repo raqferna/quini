@@ -1,15 +1,15 @@
 ---
 import { db } from '../lib/firebase.js';
+import dianaImageUrl from '../../public/images/diana.png?url';
 
 // Define a complete, default structure for the content
 const defaultContent = {
-  site: { title: "Cerveceria 501 Sport Pub" },
-  header: { title: "Cerveceria 501 Sport Pub", nav: [] },
-  hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble", backgroundImage: "" },
-  about: { title: "Sobre Nosotros", text: "Contenido sobre nosotros aquí." },
+  site: { title: "Mi Sitio Web" },
+  header: { title: "Mi Negocio", nav: [] },
+  hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble", text: "Contenido sobre nosotros aquí." },
   gallery: { title: "Galería", images: [] },
   events: { title: "Eventos", list: [] },
-  footer: { title: "Contacto", address: "", schedule: "", social: []}
+  footer: { title: "Contacto", address: "", schedule: "", social: [] }
 };
 
 // Fetch content from Firestore
@@ -21,12 +21,14 @@ let content = defaultContent;
 if (docSnap.exists) {
   const remoteData = docSnap.data() || {};
   // Deep merge the remote data into the default structure.
-  // This ensures that if a field is missing from Firestore, the default is used and the app doesn't crash.
   content = {
     site: { ...defaultContent.site, ...remoteData.site },
     header: { ...defaultContent.header, ...remoteData.header },
-    hero: { ...defaultContent.hero, ...remoteData.hero },
-    about: { ...defaultContent.about, ...remoteData.about },
+    hero: { 
+      ...defaultContent.hero, 
+      ...remoteData.hero, 
+      text: remoteData.about?.text || remoteData.hero?.text || defaultContent.hero.text,
+    },
     gallery: { ...defaultContent.gallery, ...remoteData.gallery },
     events: { ...defaultContent.events, ...remoteData.events },
     footer: { ...defaultContent.footer, ...remoteData.footer },
@@ -39,7 +41,7 @@ if (docSnap.exists) {
 } else {
   console.log("No such document! Using default content.");
 }
----
+--- 
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -47,70 +49,76 @@ if (docSnap.exists) {
     <title>{content.site.title}</title>
     <link rel="stylesheet" href="/src/styles/global.css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style define:vars={{ bgImage: `url(${dianaImageUrl})` }}>
+      body {
+        background-image: var(--bgImage);
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+      }
+    </style>
 </head>
 <body class="bg-black text-white font-sans">
-    <header class="p-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold">{content.header.title}</h1>
-        <nav>
-            {content.header.nav.map(item => (
-                <a href={item.href} class="mx-2 hover:text-red-500">{item.name}</a>
-            ))}
-        </nav>
-    </header>
+    <div class="fixed inset-0 bg-black bg-opacity-75 z-[-1]"></div>
 
-    <main>
-        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style={`background-image: url('${content.hero.backgroundImage}');`}>
-            <div>
-                <h2 class="text-6xl font-extrabold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{content.hero.title}</h2>
-                <p class="text-xl mt-4">{content.hero.subtitle}</p>
-            </div>
-        </section>
-
-        <section id="about" class="py-20 px-4 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1543862415-9694d7369a03?q=80&w=2070&auto=format&fit=crop');">
-            <div class="absolute inset-0 bg-black opacity-50"></div>
-            <div class="relative">
-                <h3 class="text-4xl font-bold text-center mb-8">{content.about.title}</h3>
-                <p class="max-w-3xl mx-auto text-lg text-center">{content.about.text}</p>
-            </div>
-        </section>
-
-        <section id="gallery" class="py-20 px-4 bg-gray-900">
-            <h3 class="text-4xl font-bold text-center mb-8">{content.gallery.title}</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {content.gallery.images.map(image => (
-                    <img src={image} alt={`Galería de ${content.site.title}`} class="w-full h-64 object-cover rounded-lg shadow-lg" />
+    <div class="relative z-1">
+        <header class="p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold transition-colors duration-300 hover:text-yellow-400">{content.header.title}</h1>
+            <nav>
+                {content.header.nav.map(item => (
+                    <a href={item.href} class="mx-2 hover:text-yellow-400 transition-colors duration-300">{item.name}</a>
                 ))}
-            </div>
-        </section>
+            </nav>
+        </header>
 
-        <section id="events" class="py-20 px-4">
-            <h3 class="text-4xl font-bold text-center mb-8">{content.events.title}</h3>
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                {content.events.list.map(event => (
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h4 class="text-2xl font-bold mb-2">{event.title}</h4>
-                        <p class="text-red-400 mb-4">{event.schedule}</p>
-                        <p>{event.description}</p>
-                    </div>
+        <main>
+            <section id="hero" class="py-64 flex items-center justify-center text-center">
+                <div>
+                    <h2 class="text-6xl font-extrabold text-white transition-colors duration-300 hover:text-yellow-400" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{content.hero.title}</h2>
+                    <p class="text-xl mt-4 transition-colors duration-300 hover:text-yellow-400">{content.hero.subtitle}</p>
+                    <p class="max-w-3xl mx-auto text-lg text-center mt-8 transition-colors duration-300 hover:text-yellow-400">{content.hero.text}</p>
+                </div>
+            </section>
+
+            <section id="gallery" class="py-20 px-4 bg-black bg-opacity-50">
+                <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400">{content.gallery.title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {content.gallery.images.map(image => (
+                        <div class="bg-black bg-opacity-75 rounded-lg shadow-lg flex items-center justify-center">
+                            <img src={image} alt={`Galería de ${content.site.title}`} class="w-full h-64 object-contain" />
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section id="events" class="py-20 px-4 bg-gray-900 bg-opacity-75">
+                <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400">{content.events.title}</h3>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {content.events.list.map(event => (
+                        <div class="bg-gray-800 bg-opacity-90 p-6 rounded-lg">
+                            <h4 class="text-2xl font-bold mb-2 transition-colors duration-300 hover:text-yellow-400">{event.title}</h4>
+                            <p class="text-yellow-400 mb-4">{event.schedule}</p>
+                            <p class="transition-colors duration-300 hover:text-yellow-400">{event.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        </main>
+
+        <footer id="contact" class="bg-gray-900 bg-opacity-75 py-10 px-4 text-center">
+            <h3 class="text-3xl font-bold mb-4 transition-colors duration-300 hover:text-yellow-400">{content.footer.title}</h3>
+            <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.address}</p>
+            <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.schedule}</p>
+            <p class="mb-4">
+                Síguenos en 
+                {content.footer.social.map((link, index) => (
+                    <>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-yellow-400 hover:underline">{link.name}</a>
+                        {index < content.footer.social.length - 1 && ' y '}
+                    </>
                 ))}
-            </div>
-        </section>
-    </main>
-
-    <footer id="contact" class="bg-gray-900 py-10 px-4 text-center">
-        <h3 class="text-3xl font-bold mb-4">{content.footer.title}</h3>
-        <p class="mb-2">{content.footer.address}</p>
-        <p class="mb-2">{content.footer.schedule}</p>
-        <p class="mb-4">
-            Síguenos en 
-            {content.footer.social.map((link, index) => (
-                <>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-red-500 hover:underline">{link.name}</a>
-                    {index < content.footer.social.length - 1 && ' y '}
-                </>
-            ))}
-        </p>
-        <p>&copy; {new Date().getFullYear()} {content.footer.copyright}</p>
-    </footer>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
