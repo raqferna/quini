@@ -1,10 +1,10 @@
 ---
-const pageTitle = "Darts & Drinks";
+const pageTitle = "Cerveceria 501 Sport Pub";
 const galleryImages = [
-  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1543007168-53fe3c804561?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1579373903781-4f089141856c?q=80&w=1939&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1521405924729-bb37a6b99781?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "/images/gallery-1.jpg",
+  "/images/gallery-2.jpg",
+  "/images/gallery-3.jpg",
+  "/images/gallery-4.jpg",
 ];
 ---
 <html lang="es">
@@ -17,7 +17,7 @@ const galleryImages = [
 </head>
 <body class="bg-black text-white font-sans">
     <header class="p-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Darts & Drinks</h1>
+        <h1 class="text-2xl font-bold">Cerveceria 501 Sport Pub</h1>
         <nav>
             <a href="#about" class="mx-2 hover:text-red-500">Sobre Nosotros</a>
             <a href="#gallery" class="mx-2 hover:text-red-500">Galería</a>
@@ -27,7 +27,7 @@ const galleryImages = [
     </header>
 
     <main>
-        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style="background-image: url('https://images.unsplash.com/photo-1560089023-74a9b5c39a09?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style="background-image: url('/images/hero-background.jpg');">
             <div>
                 <h2 class="text-6xl font-extrabold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">Lanza, Bebe y Disfruta</h2>
                 <p class="text-xl mt-4">El mejor lugar para jugar a los dardos y pasar un buen rato.</p>
@@ -37,7 +37,7 @@ const galleryImages = [
         <section id="about" class="py-20 px-4">
             <h3 class="text-4xl font-bold text-center mb-8">Sobre Nosotros</h3>
             <p class="max-w-3xl mx-auto text-lg text-center">
-                En Darts & Drinks, combinamos la pasión por los dardos con un ambiente de bar inigualable. Somos el punto de encuentro para aficionados y profesionales, ofreciendo las mejores dianas, una amplia selección de bebidas y un espacio donde siempre te sentirás como en casa. Ven a demostrar tu puntería o simplemente a disfrutar de una buena noche.
+                En Cerveceria 501 Sport Pub, combinamos la pasión por los dardos con un ambiente de bar inigualable. Somos el punto de encuentro para aficionados y profesionales, ofreciendo las mejores dianas, una amplia selección de bebidas y un espacio donde siempre te sentirás como en casa. Ven a demostrar tu puntería o simplemente a disfrutar de una buena noche.
             </p>
         </section>
 
@@ -45,7 +45,7 @@ const galleryImages = [
             <h3 class="text-4xl font-bold text-center mb-8">Galería</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {galleryImages.map(image => (
-                    <img src={image} alt="Galería de Darts & Drinks" class="w-full h-auto rounded-lg shadow-lg" />
+                    <img src={image} alt="Galería de Cerveceria 501 Sport Pub" class="w-full h-64 object-cover rounded-lg shadow-lg" />
                 ))}
             </div>
         </section>
@@ -69,10 +69,10 @@ const galleryImages = [
 
     <footer id="contact" class="bg-gray-900 py-10 px-4 text-center">
         <h3 class="text-3xl font-bold mb-4">Contacto y Ubicación</h3>
-        <p class="mb-2">Calle Falsa 123, 08001 Barcelona</p>
-        <p class="mb-2">Abierto de Martes a Domingo, de 18:00h a 02:00h</p>
-        <p class="mb-4">Síguenos en <a href="#" class="text-red-500 hover:underline">Instagram</a> y <a href="#" class="text-red-500 hover:underline">Facebook</a></p>
-        <p>&copy; {new Date().getFullYear()} Darts & Drinks. Todos los derechos reservados.</p>
+        <p class="mb-2">C. Aragón, 12, Gijon-Sur, 33210 Gijón, Asturias</p>
+        <p class="mb-2">Abierto todos los dias de 12:00h a 01:00h, excepto los lunes.</p>
+        <p class="mb-4">Síguenos en <a href="https://www.instagram.com/josevigil501/" target="_blank" rel="noopener noreferrer" class="text-red-500 hover:underline">Instagram</a></p>
+        <p>&copy; {new Date().getFullYear()} Cerveceria 501 Sport Pub. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>
