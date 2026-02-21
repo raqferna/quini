@@ -1,0 +1,59 @@
+{
+  "site": {
+    "title": "Cerveceria 501 Sport Pub"
+  },
+  "header": {
+    "title": "Cerveceria 501 Sport Pub",
+    "nav": [
+      { "name": "Sobre Nosotros", "href": "#about" },
+      { "name": "Galería", "href": "#gallery" },
+      { "name": "Eventos", "href": "#events" },
+      { "name": "Contacto", "href": "#contact" }
+    ]
+  },
+  "hero": {
+    "title": "Lanza, Bebe y Disfruta",
+    "subtitle": "El mejor lugar para jugar a los dardos y pasar un buen rato.",
+    "backgroundImage": "/images/hero-background.jpg"
+  },
+  "about": {
+    "title": "Sobre Nosotros",
+    "text": "En Cerveceria 501 Sport Pub, combinamos la pasión por los dardos con un ambiente de bar inigualable. Somos el punto de encuentro para aficionados y profesionales, ofreciendo las mejores dianas, una amplia selección de bebidas y un espacio donde siempre te sentirás como en casa. Ven a demostrar tu puntería o simplemente a disfrutar de una buena noche."
+  },
+  "gallery": {
+    "title": "Galería",
+    "images": [
+      "/images/gallery-1.jpg",
+      "/images/gallery-2.jpg",
+      "/images/gallery-3.jpg",
+      "/images/gallery-4.jpg"
+    ]
+  },
+  "events": {
+    "title": "Próximos Eventos",
+    "list": [
+      {
+        "title": "Torneo Semanal de Dardos",
+        "schedule": "Todos los viernes a las 20:00h",
+        "description": "Inscripción abierta. ¡Demuestra que eres el mejor y gana fantásticos premios! Abierto a todos los niveles."
+      },
+      {
+        "title": "Noche de Cerveza Artesanal",
+        "schedule": "El último sábado de cada mes",
+        "description": "Descubre nuestra selección de cervezas artesanales locales e internacionales con descuentos especiales durante toda la noche."
+      }
+    ]
+  },
+  "footer": {
+    "title": "Contacto y Ubicación",
+    "address": "C. Aragón, 12, Gijon-Sur, 33210 Gijón, Asturias",
+    "schedule": "Abierto todos los dias de 12:00h a 01:00h, excepto los lunes.",
+    "social": [
+      {
+        "name": "Instagram",
+        "url": "https://www.instagram.com/josevigil501/"
+      }
+    ],
+    "copyright": "Cerveceria 501 Sport Pub. Todos los derechos reservados."
+  }
+}

@@ -1,78 +1,96 @@
 ---
-const pageTitle = "Cerveceria 501 Sport Pub";
-const galleryImages = [
-  "/images/gallery-1.jpg",
-  "/images/gallery-2.jpg",
-  "/images/gallery-3.jpg",
-  "/images/gallery-4.jpg",
-];
+import { db } from '../lib/firebase.js';
+import { doc, getDoc } from 'firebase/firestore';
+
+// Fetch content from Firestore
+const docRef = doc(db, "content", "pageData");
+const docSnap = await getDoc(docRef);
+
+let content = {};
+if (docSnap.exists()) {
+  content = docSnap.data();
+} else {
+  // Use placeholder content if Firestore is empty
+  console.log("No such document! Using fallback content.");
+  content = {
+    site: { title: "Datos no encontrados" },
+    header: { title: "Cargando...", nav: [] },
+    hero: { title: "Bienvenido", subtitle: "Contenido no encontrado en la base de datos.", backgroundImage: "" },
+    about: { title: "Sobre Nosotros", text: "Por favor, configura el documento 'pageData' en tu colección 'content' en Firestore." },
+    gallery: { title: "Galería", images: [] },
+    events: { title: "Eventos", list: [] },
+    footer: { title: "Contacto", address: "", schedule: "", social: [], copyright: "" }
+  };
+}
 ---
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>{pageTitle}</title>
+    <title>{content.site.title}</title>
     <link rel="stylesheet" href="/src/styles/global.css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-black text-white font-sans">
     <header class="p-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Cerveceria 501 Sport Pub</h1>
+        <h1 class="text-2xl font-bold">{content.header.title}</h1>
         <nav>
-            <a href="#about" class="mx-2 hover:text-red-500">Sobre Nosotros</a>
-            <a href="#gallery" class="mx-2 hover:text-red-500">Galería</a>
-            <a href="#events" class="mx-2 hover:text-red-500">Eventos</a>
-            <a href="#contact" class="mx-2 hover:text-red-500">Contacto</a>
+            {content.header.nav.map(item => (
+                <a href={item.href} class="mx-2 hover:text-red-500">{item.name}</a>
+            ))}
         </nav>
     </header>
 
     <main>
-        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style="background-image: url('/images/hero-background.jpg');">
+        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style={`background-image: url('${content.hero.backgroundImage}');`}>
             <div>
-                <h2 class="text-6xl font-extrabold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">Lanza, Bebe y Disfruta</h2>
-                <p class="text-xl mt-4">El mejor lugar para jugar a los dardos y pasar un buen rato.</p>
+                <h2 class="text-6xl font-extrabold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{content.hero.title}</h2>
+                <p class="text-xl mt-4">{content.hero.subtitle}</p>
             </div>
         </section>
 
         <section id="about" class="py-20 px-4">
-            <h3 class="text-4xl font-bold text-center mb-8">Sobre Nosotros</h3>
-            <p class="max-w-3xl mx-auto text-lg text-center">
-                En Cerveceria 501 Sport Pub, combinamos la pasión por los dardos con un ambiente de bar inigualable. Somos el punto de encuentro para aficionados y profesionales, ofreciendo las mejores dianas, una amplia selección de bebidas y un espacio donde siempre te sentirás como en casa. Ven a demostrar tu puntería o simplemente a disfrutar de una buena noche.
-            </p>
+            <h3 class="text-4xl font-bold text-center mb-8">{content.about.title}</h3>
+            <p class="max-w-3xl mx-auto text-lg text-center">{content.about.text}</p>
         </section>
 
         <section id="gallery" class="py-20 px-4 bg-gray-900">
-            <h3 class="text-4xl font-bold text-center mb-8">Galería</h3>
+            <h3 class="text-4xl font-bold text-center mb-8">{content.gallery.title}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {galleryImages.map(image => (
-                    <img src={image} alt="Galería de Cerveceria 501 Sport Pub" class="w-full h-64 object-cover rounded-lg shadow-lg" />
+                {content.gallery.images.map(image => (
+                    <img src={image} alt={`Galería de ${content.site.title}`} class="w-full h-64 object-cover rounded-lg shadow-lg" />
                 ))}
             </div>
         </section>
 
         <section id="events" class="py-20 px-4">
-            <h3 class="text-4xl font-bold text-center mb-8">Próximos Eventos</h3>
+            <h3 class="text-4xl font-bold text-center mb-8">{content.events.title}</h3>
             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h4 class="text-2xl font-bold mb-2">Torneo Semanal de Dardos</h4>
-                    <p class="text-red-400 mb-4">Todos los viernes a las 20:00h</p>
-                    <p>Inscripción abierta. ¡Demuestra que eres el mejor y gana fantásticos premios! Abierto a todos los niveles.</p>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h4 class="text-2xl font-bold mb-2">Noche de Cerveza Artesanal</h4>
-                    <p class="text-red-400 mb-4">El último sábado de cada mes</p>
-                    <p>Descubre nuestra selección de cervezas artesanales locales e internacionales con descuentos especiales durante toda la noche.</p>
-                </div>
+                {content.events.list.map(event => (
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="text-2xl font-bold mb-2">{event.title}</h4>
+                        <p class="text-red-400 mb-4">{event.schedule}</p>
+                        <p>{event.description}</p>
+                    </div>
+                ))}
             </div>
         </section>
     </main>
 
     <footer id="contact" class="bg-gray-900 py-10 px-4 text-center">
-        <h3 class="text-3xl font-bold mb-4">Contacto y Ubicación</h3>
-        <p class="mb-2">C. Aragón, 12, Gijon-Sur, 33210 Gijón, Asturias</p>
-        <p class="mb-2">Abierto todos los dias de 12:00h a 01:00h, excepto los lunes.</p>
-        <p class="mb-4">Síguenos en <a href="https://www.instagram.com/josevigil501/" target="_blank" rel="noopener noreferrer" class="text-red-500 hover:underline">Instagram</a></p>
-        <p>&copy; {new Date().getFullYear()} Cerveceria 501 Sport Pub. Todos los derechos reservados.</p>
+        <h3 class="text-3xl font-bold mb-4">{content.footer.title}</h3>
+        <p class="mb-2">{content.footer.address}</p>
+        <p class="mb-2">{content.footer.schedule}</p>
+        <p class="mb-4">
+            Síguenos en 
+            {content.footer.social.map((link, index) => (
+                <>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-red-500 hover:underline">{link.name}</a>
+                    {index < content.footer.social.length - 1 && ' y '}
+                </>
+            ))}
+        </p>
+        <p>&copy; {new Date().getFullYear()} {content.footer.copyright}</p>
     </footer>
 </body>
 </html>
