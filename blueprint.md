@@ -6,7 +6,7 @@ Crear una página web estática, atractiva y fácil de mantener para un bar de d
 
 ## Gestión de Contenido
 
-Para facilitar las actualizaciones a usuarios no técnicos, todo el contenido editable (textos, rutas de imágenes, información de contacto, etc.) se centralizará en un único archivo: `src/content.json`. La página web leerá dinámicamente este archivo para mostrar la información. Esto significa que para cambiar cualquier texto o imagen, solo es necesario editar este archivo JSON, sin tocar el código de la aplicación.
+Para facilitar las actualizaciones, todo el contenido editable (textos, rutas de imágenes, información de contacto, etc.) se gestiona de forma centralizada a través de **Firebase Firestore**. La página web se conecta a Firestore para obtener dinámicamente toda la información en tiempo real. Esto permite que los cambios de contenido se reflejen en el sitio al instante sin necesidad de modificar el código de la aplicación.
 
 ## Esquema del Proyecto
 
@@ -20,7 +20,7 @@ Para facilitar las actualizaciones a usuarios no técnicos, todo el contenido ed
 
 *   **Página Única (Single-Page).**
 *   **Diseño Responsivo.**
-*   **Secciones Dinámicas desde `content.json`:**
+*   **Secciones Dinámicas desde Firebase Firestore:**
     *   Encabezado
     *   Sección Hero
     *   Sobre Nosotros
@@ -30,7 +30,4 @@ Para facilitar las actualizaciones a usuarios no técnicos, todo el contenido ed
 
 ## Plan Actual
 
-1.  **Refactorización a `content.json`:**
-    *   Crear el archivo `src/content.json` con toda la información editable.
-    *   Modificar `src/pages/index.astro` para que lea y muestre el contenido desde `src/content.json`.
-    *   Actualizar `blueprint.md` para documentar la nueva arquitectura de contenido.
+El objetivo actual es asegurar que todos los datos se carguen correctamente desde **Firebase Firestore** y que la aplicación sea robusta frente a posibles datos faltantes o malformados. Cualquier contenido nuevo o modificación se realizará directamente en la base de datos de Firestore.

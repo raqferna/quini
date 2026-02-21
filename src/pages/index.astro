@@ -1,26 +1,43 @@
 ---
 import { db } from '../lib/firebase.js';
-import { doc, getDoc } from 'firebase/firestore';
+
+// Define a complete, default structure for the content
+const defaultContent = {
+  site: { title: "Cerveceria 501 Sport Pub" },
+  header: { title: "Cerveceria 501 Sport Pub", nav: [] },
+  hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble", backgroundImage: "" },
+  about: { title: "Sobre Nosotros", text: "Contenido sobre nosotros aquí." },
+  gallery: { title: "Galería", images: [] },
+  events: { title: "Eventos", list: [] },
+  footer: { title: "Contacto", address: "", schedule: "", social: []}
+};
 
 // Fetch content from Firestore
-const docRef = doc(db, "content", "pageData");
-const docSnap = await getDoc(docRef);
+const docRef = db.collection('content').doc('pageData');
+const docSnap = await docRef.get();
 
-let content = {};
-if (docSnap.exists()) {
-  content = docSnap.data();
-} else {
-  // Use placeholder content if Firestore is empty
-  console.log("No such document! Using fallback content.");
+let content = defaultContent;
+
+if (docSnap.exists) {
+  const remoteData = docSnap.data() || {};
+  // Deep merge the remote data into the default structure.
+  // This ensures that if a field is missing from Firestore, the default is used and the app doesn't crash.
   content = {
-    site: { title: "Datos no encontrados" },
-    header: { title: "Cargando...", nav: [] },
-    hero: { title: "Bienvenido", subtitle: "Contenido no encontrado en la base de datos.", backgroundImage: "" },
-    about: { title: "Sobre Nosotros", text: "Por favor, configura el documento 'pageData' en tu colección 'content' en Firestore." },
-    gallery: { title: "Galería", images: [] },
-    events: { title: "Eventos", list: [] },
-    footer: { title: "Contacto", address: "", schedule: "", social: [], copyright: "" }
-  };
+    site: { ...defaultContent.site, ...remoteData.site },
+    header: { ...defaultContent.header, ...remoteData.header },
+    hero: { ...defaultContent.hero, ...remoteData.hero },
+    about: { ...defaultContent.about, ...remoteData.about },
+    gallery: { ...defaultContent.gallery, ...remoteData.gallery },
+    events: { ...defaultContent.events, ...remoteData.events },
+    footer: { ...defaultContent.footer, ...remoteData.footer },
+  }
+  // Ensure that array properties are always arrays to prevent runtime errors.
+  if (!Array.isArray(content.header.nav)) content.header.nav = [];
+  if (!Array.isArray(content.gallery.images)) content.gallery.images = [];
+  if (!Array.isArray(content.events.list)) content.events.list = [];
+  if (!Array.isArray(content.footer.social)) content.footer.social = [];
+} else {
+  console.log("No such document! Using default content.");
 }
 ---
 <html lang="es">
@@ -49,9 +66,12 @@ if (docSnap.exists()) {
             </div>
         </section>
 
-        <section id="about" class="py-20 px-4">
-            <h3 class="text-4xl font-bold text-center mb-8">{content.about.title}</h3>
-            <p class="max-w-3xl mx-auto text-lg text-center">{content.about.text}</p>
+        <section id="about" class="py-20 px-4 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1543862415-9694d7369a03?q=80&w=2070&auto=format&fit=crop');">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+            <div class="relative">
+                <h3 class="text-4xl font-bold text-center mb-8">{content.about.title}</h3>
+                <p class="max-w-3xl mx-auto text-lg text-center">{content.about.text}</p>
+            </div>
         </section>
 
         <section id="gallery" class="py-20 px-4 bg-gray-900">

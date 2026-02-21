@@ -1,27 +1,16 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import admin from 'firebase-admin';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAcldQYjIqVD3BPwRyzocfDTE3Cktxos4s",
-  authDomain: "quini-cms.firebaseapp.com",
-  projectId: "quini-cms",
-  storageBucket: "quini-cms.firebasestorage.app",
-  messagingSenderId: "465095637451",
-  appId: "1:465095637451:web:f12b9f8b1a93a5ca04de4e",
-  measurementId: "G-JFW8CXXZ0H"
-};
+// Get the credentials from the environment variable
+const serviceAccount = JSON.parse(import.meta.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
-// Initialize Firebase
-let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
+// Initialize the app if it hasn't been already
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
 }
 
-const db = getFirestore(app);
-const storage = getStorage(app);
+// Get the firestore instance
+const db = admin.firestore();
 
-export { db, storage };
+export { db };
