@@ -1,38 +1,78 @@
 ---
-// Component Imports
-import Counter from '../components/Counter';
-
-const someProps = {
-	count: 0,
-};
-
-// Full Astro Component Syntax:
-// https://docs.astro.build/basics/astro-components/
+const pageTitle = "Darts & Drinks";
+const galleryImages = [
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1543007168-53fe3c804561?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1579373903781-4f089141856c?q=80&w=1939&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1521405924729-bb37a6b99781?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+];
 ---
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-black text-white font-sans">
+    <header class="p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Darts & Drinks</h1>
+        <nav>
+            <a href="#about" class="mx-2 hover:text-red-500">Sobre Nosotros</a>
+            <a href="#gallery" class="mx-2 hover:text-red-500">Galería</a>
+            <a href="#events" class="mx-2 hover:text-red-500">Eventos</a>
+            <a href="#contact" class="mx-2 hover:text-red-500">Contacto</a>
+        </nav>
+    </header>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<style>
-			html,
-			body {
-				font-family: system-ui;
-				margin: 0;
-			}
-			body {
-				padding: 2rem;
-			}
-		</style>
-	</head>
-	<body>
-		<main>
-			<Counter {...someProps} client:visible>
-				<h1>Hello, React!</h1>
-			</Counter>
-		</main>
-	</body>
+    <main>
+        <section id="hero" class="h-screen bg-cover bg-center flex items-center justify-center text-center" style="background-image: url('https://images.unsplash.com/photo-1560089023-74a9b5c39a09?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+            <div>
+                <h2 class="text-6xl font-extrabold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">Lanza, Bebe y Disfruta</h2>
+                <p class="text-xl mt-4">El mejor lugar para jugar a los dardos y pasar un buen rato.</p>
+            </div>
+        </section>
+
+        <section id="about" class="py-20 px-4">
+            <h3 class="text-4xl font-bold text-center mb-8">Sobre Nosotros</h3>
+            <p class="max-w-3xl mx-auto text-lg text-center">
+                En Darts & Drinks, combinamos la pasión por los dardos con un ambiente de bar inigualable. Somos el punto de encuentro para aficionados y profesionales, ofreciendo las mejores dianas, una amplia selección de bebidas y un espacio donde siempre te sentirás como en casa. Ven a demostrar tu puntería o simplemente a disfrutar de una buena noche.
+            </p>
+        </section>
+
+        <section id="gallery" class="py-20 px-4 bg-gray-900">
+            <h3 class="text-4xl font-bold text-center mb-8">Galería</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {galleryImages.map(image => (
+                    <img src={image} alt="Galería de Darts & Drinks" class="w-full h-auto rounded-lg shadow-lg" />
+                ))}
+            </div>
+        </section>
+
+        <section id="events" class="py-20 px-4">
+            <h3 class="text-4xl font-bold text-center mb-8">Próximos Eventos</h3>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold mb-2">Torneo Semanal de Dardos</h4>
+                    <p class="text-red-400 mb-4">Todos los viernes a las 20:00h</p>
+                    <p>Inscripción abierta. ¡Demuestra que eres el mejor y gana fantásticos premios! Abierto a todos los niveles.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="text-2xl font-bold mb-2">Noche de Cerveza Artesanal</h4>
+                    <p class="text-red-400 mb-4">El último sábado de cada mes</p>
+                    <p>Descubre nuestra selección de cervezas artesanales locales e internacionales con descuentos especiales durante toda la noche.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact" class="bg-gray-900 py-10 px-4 text-center">
+        <h3 class="text-3xl font-bold mb-4">Contacto y Ubicación</h3>
+        <p class="mb-2">Calle Falsa 123, 08001 Barcelona</p>
+        <p class="mb-2">Abierto de Martes a Domingo, de 18:00h a 02:00h</p>
+        <p class="mb-4">Síguenos en <a href="#" class="text-red-500 hover:underline">Instagram</a> y <a href="#" class="text-red-500 hover:underline">Facebook</a></p>
+        <p>&copy; {new Date().getFullYear()} Darts & Drinks. Todos los derechos reservados.</p>
+    </footer>
+</body>
 </html>

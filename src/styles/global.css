@@ -1,0 +1,9 @@
+/* Opcional: Añade aquí estilos globales o personalizados que no se cubran con Tailwind */
+html {
+  scroll-behavior: smooth; /* Para un desplazamiento suave al hacer clic en los enlaces de navegación */
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
