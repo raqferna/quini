@@ -1,3 +1,4 @@
+
 ---
 import { db } from '../lib/firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
@@ -84,6 +85,9 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
       .gallery-item-container:hover .gallery-image {
         transform: scale(1.1);
       }
+      .header-logo {
+        mix-blend-mode: screen; /* This will help blend the logo with the background */
+      }
     </style>
 </head>
 <body class="bg-black text-white font-sans">
@@ -91,12 +95,13 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
 
     <div class="relative z-1">
         <header class="p-4 flex justify-between items-center">
-            <h1 
-                class="font-logo text-6xl text-yellow-400 transition-all duration-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]"
-                aria-label={content.header.title}
-            >
-                501
-            </h1>
+            <a href="/" aria-label="Volver al inicio">
+                <img 
+                    src="/images/logo.png" 
+                    alt={content.header.title} 
+                    class="h-20 transition-all duration-300 hover:opacity-80 hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.7)] header-logo"
+                />
+            </a>
             <nav>
                 {navItems.map(item => (
                     <a href={item.href} class="mx-2 hover:text-yellow-400 transition-colors duration-300">{item.name}</a>
@@ -108,7 +113,7 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
             <section id="hero" class="py-64 flex items-center justify-center text-center">
                 <div>
                     <h2 class="text-6xl font-extrabold text-white transition-colors duration-300 hover:text-yellow-400" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{content.hero.title}</h2>
-                    <p class="text-xl mt-4 transition-colors duration-300 hover:text-yellow-400">{content.hero.subtitle}</p>
+                    <p class="text-xl mt-4 max-w-2xl mx-auto transition-colors duration-300 hover:text-yellow-400 text-center">{content.hero.subtitle}</p>
                 </div>
             </section>
 
