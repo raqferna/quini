@@ -1,39 +1,55 @@
-# Blueprint: Sitio Web "5091"
+# Blueprint: Cervecería 501 - Sitio Web Oficial
 
 ## Visión General
 
-Crear una página web estática y de una sola página para el bar "5091". El objetivo es tener un sitio visualmente impactante, moderno y fácil de navegar que capture la esencia del bar. La web presenta un diseño inmersivo con una cabecera fija, una imagen de fondo persistente y secciones de contenido con efectos de transparencia.
+Crear una página web estática, inmersiva y de una sola página para la "Cervecería 501". El sitio está diseñado para capturar la energía y el ambiente único del bar, utilizando un diseño moderno y audaz, y está gestionado a través de Firebase para permitir actualizaciones de contenido dinámicas y sencillas.
 
-## Gestión de Contenido
+## Arquitectura de Contenido (CMS)
 
-El contenido principal (textos, eventos, información de contacto, etc.) se gestiona a través de **Firebase Firestore**. Esto permite una actualización rápida y sencilla del contenido sin necesidad de modificar el código fuente, separando la lógica de presentación de los datos.
+El sitio utiliza una arquitectura de contenido desacoplada (headless) con Firebase, separando los datos de la presentación:
+
+*   **Firebase Firestore:** Actúa como el CMS principal para todo el contenido de texto. Un único documento (`content/pageData`) almacena los textos del hero, la sección "Sobre Nosotros", la lista de eventos y la información del footer. Esto permite al equipo del bar actualizar la información en tiempo real sin tocar el código.
+
+*   **Firebase Storage:** Se utiliza para gestionar todas las imágenes de la galería. Las imágenes se suben a la carpeta `/gallery` y el sitio las obtiene dinámicamente. Gracias a una función de búsqueda recursiva, las imágenes pueden organizarse en subcarpetas dentro de `/gallery` para una mejor organización, y el sitio las encontrará igualmente.
 
 ## Esquema del Proyecto
 
 ### Estilo y Diseño
 
-*   **Paleta de colores:** La base son los tonos oscuros (negro y grises), con un **amarillo vibrante** como color de acento para los elementos interactivos y destacados, creando un contraste fuerte y memorable.
+*   **Paleta de Colores:** Una base de tonos oscuros (negro y grises) que crea un ambiente íntimo, contrastada con un **amarillo vibrante** para llamadas a la acción, enlaces y efectos hover, generando un look enérgico y memorable.
 *   **Tipografía:**
-    *   **Fuente Logo (`Lobster`):** Usada para el nombre "5091" en la cabecera, dándole un toque clásico y estilizado.
-    *   **Fuente Títulos (`Permanent Marker`):** Aplicada a todos los títulos de sección y elementos de navegación, unificando el diseño con un estilo audaz y "gamberro".
-*   **Header Fijo:** La cabecera permanece fija en la parte superior de la página durante el scroll. Tiene un fondo semitransparente con un efecto de desenfoque (`backdrop-blur`) que la integra elegantemente con el contenido.
-*   **Logo en el Header:** El logo circular del bar se encuentra en la cabecera, junto al nombre, sirviendo como un ancla visual constante de la marca.
-*   **Fondo Inmersivo:** Una imagen de fondo (`diana.png`) cubre toda la página y permanece estática, creando una sensación de profundidad. Una superposición oscura garantiza la legibilidad del texto.
-*   **Efectos de Transparencia:** Las diferentes secciones de contenido juegan con fondos semitransparentes para permitir que la imagen de fondo se insinúe, añadiendo capas y dinamismo al diseño.
-*   **Interactividad:** La mayoría de los textos y enlaces reaccionan al pasar el cursor sobre ellos, cambiando su color a amarillo, lo que proporciona feedback visual al usuario.
+    *   **Fuente Logo (`Lobster`):** Utilizada para el nombre "Cervecería 501" en la cabecera, aportando un toque estilizado y reconocible.
+    *   **Fuente Títulos (`Permanent Marker`):** Aplicada a los títulos de sección y a la navegación, esta fuente de estilo "escrito a mano" unifica el diseño con una estética audaz y rebelde.
+*   **Header Fijo y Translúcido:** La cabecera se mantiene fija en la parte superior, con un fondo amarillo muy sutil y translúcido (`bg-yellow-400 bg-opacity-20`) y un efecto de desenfoque (`backdrop-blur-md`). Esto permite que la imagen de fondo se vea a través, integrando la cabecera en el diseño inmersivo.
+*   **Legibilidad del Header:** Para asegurar una legibilidad perfecta del texto blanco sobre el fondo claro del header, se ha aplicado una sombra de texto (`text-shadow`), que crea un contorno sutil y efectivo.
+*   **Fondo Inmersivo:** Una imagen de fondo (`diana.png`) cubre toda la página y permanece estática (`background-attachment: fixed`), creando un efecto de profundidad. Una superposición oscura general asegura la legibilidad del contenido en todas las secciones.
 
-### Características y Estructura
+### Características y Funcionalidad
 
-*   **Página Única (Single-Page):** Toda la información se presenta en una sola página con scroll vertical, con enlaces de navegación que desplazan al usuario a la sección correspondiente.
-*   **Diseño Responsivo:** La web se adapta a dispositivos móviles y de escritorio.
-*   **Header Fijo:** Contiene el logo, el nombre del bar y la navegación principal.
-*   **Menú Móvil (Hamburguesa):** En dispositivos móviles, la navegación se oculta tras un botón de "hamburguesa" para ahorrar espacio y mantener un diseño limpio.
-*   **Sección Hero:** La primera sección que ve el usuario. Presenta un título de bienvenida y un subtítulo, junto con una llamada a la acción principal ("Ver Eventos").
-*   **Secciones de Contenido:** "Sobre Nosotros", "Galería" y "Eventos".
-*   **Footer:** Pie de página con información de contacto y enlaces a redes sociales.
+*   **Página Única (Single-Page):** Toda la información se presenta en una sola página con scroll vertical. La navegación del header desplaza suavemente al usuario a la sección correspondiente.
+*   **Diseño Responsivo y Móvil:** El diseño se adapta perfectamente a cualquier tamaño de pantalla.
+    *   **Menú Móvil Funcional:** En dispositivos móviles, un menú de hamburguesa deslizable desde la derecha (`translate-x-full`) proporciona una navegación limpia y funcional.
+*   **Galería Dinámica desde Firebase Storage:**
+    *   Las imágenes se cargan automáticamente desde la carpeta `/gallery` en Firebase Storage.
+    *   El código utiliza una función **recursiva** con `listAll` para buscar imágenes en `/gallery` y todas sus subcarpetas, ofreciendo flexibilidad en la organización de archivos.
+    *   Las URLs de descarga se generan dinámicamente, y la galería se renderiza en el lado del servidor (`server-side rendering`) por Astro.
+*   **Carrusel de Eventos Horizontal:**
+    *   La sección de eventos se presenta como un carrusel horizontal deslizable, ideal para la navegación táctil en dispositivos móviles.
+    *   Utiliza `flex` y `overflow-x-auto` para crear el contenedor deslizable.
+    *   Las tarjetas de evento tienen un ancho fijo (`flex-shrink-0`) para mantener un tamaño consistente durante el scroll.
+    *   La barra de desplazamiento horizontal está oculta mediante CSS (`.hide-scrollbar`) para una apariencia más limpia y nativa.
+*   **Configuración de Acceso a Storage:**
+    *   **CORS:** Se ha configurado una política de CORS (`cors.json`) en el bucket para permitir que el navegador solicite las imágenes desde el dominio del sitio web.
+    *   **Reglas de Seguridad:** Se han establecido reglas específicas y seguras en Firebase Storage para permitir la lectura pública (`allow read`) **únicamente** en la carpeta `/gallery`, manteniendo el resto del bucket privado.
 
-## Plan Actual
+## Plan y Estado Actual
 
-1.  **Sincronizar `blueprint.md`:** **(Completado)** El documento ha sido actualizado para reflejar la nueva estructura del proyecto.
-2.  **Agrandar el Logo:** **(Completado)** Se ha aumentado el tamaño del logo en la cabecera.
-3.  **Implementar Menú Móvil:** **(Pendiente)** Añadir el código JavaScript necesario para que el menú de hamburguesa sea funcional en dispositivos móviles.
+*   **Implementación de Diseño Inmersivo:** **(Completado)**
+*   **Integración de Contenido con Firestore:** **(Completado)**
+*   **Creación del Header Fijo con Logo Grande:** **(Completado)**
+*   **Implementación del Menú Móvil Funcional:** **(Completado)**
+*   **Integración de Galería Dinámica con Firebase Storage:** **(Completado)**
+*   **Creación del Carrusel de Eventos Horizontal:** **(Completado)**
+*   **Configuración de CORS y Reglas de Seguridad de Storage:** **(Completado)**
+
+**El proyecto se encuentra en un estado estable y funcional. Todas las tareas planificadas han sido completadas.**

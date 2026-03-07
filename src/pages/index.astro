@@ -1,6 +1,7 @@
 ---
-import { db } from '../lib/firebase.js';
+import { db, storage } from '../lib/firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
+import { ref, listAll, getDownloadURL } from 'firebase/storage';
 
 // Define image paths
 const dianaImageUrl = '/images/diana.png';
@@ -12,13 +13,33 @@ const defaultContent = {
   hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble" },
   about: { title: "Sobre Nosotros", text: "Nacimos de la locura y las ganas de pasarlo bien. Somos más que un bar: somos tu punto de encuentro, tu segunda casa, el lugar donde las anécdotas nacen y las noches se vuelven legendarias. Con la mejor música, un ambiente que te atrapa y una familia que no para de crecer, te invitamos a ser parte de nuestra historia. ¿Te apuntas a la próxima aventura?"},
   gallery: { title: "Galería", images: [] },
-  events: { title: "Eventos", list: [] },
+  events: { title: "Eventos", list: [{title: "Noche de Trivia", schedule: "Todos los jueves, 21:00h", description: "Pon a prueba tus conocimientos y gana premios increíbles."}, {title: "Concierto Acústico", schedule: "Sábado 25, 22:30h", description: "Disfruta de la mejor música en directo con artistas locales."}, {title: "Fiesta de los 80", schedule: "Viernes 31, 23:00h", description: "Vuelve a la década de los 80 con los mejores hits y disfraces."}] },
   footer: { title: "Contacto", address: "", schedule: "", social: [] }
 };
 
 let content = defaultContent;
 
+// --- Recursive function to get all files from a folder and its subfolders ---
+async function getAllImageUrls(folderRef) {
+    let imageUrls = [];
+    try {
+        const res = await listAll(folderRef);
+        const urlPromises = res.items.map(itemRef => getDownloadURL(itemRef));
+        const urls = await Promise.all(urlPromises);
+        imageUrls.push(...urls);
+
+        for (const prefixRef of res.prefixes) {
+            const subfolderUrls = await getAllImageUrls(prefixRef);
+            imageUrls.push(...subfolderUrls);
+        }
+    } catch (error) {
+        console.error(`Error listing images in ${folderRef.fullPath}:`, error);
+    }
+    return imageUrls;
+}
+
 try {
+  // Fetch content from Firestore
   const docRef = doc(db, 'content', 'pageData');
   const docSnap = await getDoc(docRef);
 
@@ -33,14 +54,24 @@ try {
       events: { ...defaultContent.events, ...remoteData.events },
       footer: { ...defaultContent.footer, ...remoteData.footer },
     };
-    if (!Array.isArray(content.gallery.images)) content.gallery.images = [];
-    if (!Array.isArray(content.events.list)) content.events.list = [];
+    if (!content.events || !Array.isArray(content.events.list) || content.events.list.length === 0) {
+      content.events = defaultContent.events;
+    }
     if (!Array.isArray(content.footer.social)) content.footer.social = [];
   } else {
     console.log("No such document! Using default content.");
   }
+
+  // Fetch images from Firebase Storage
+  const galleryRootRef = ref(storage, 'gallery');
+  const imageUrls = await getAllImageUrls(galleryRootRef);
+  
+  if (imageUrls.length > 0) {
+    content.gallery.images = imageUrls;
+  }
+
 } catch (error) {
-  console.error("Failed to fetch data from Firestore. Using default content.", error);
+  console.error("A critical error occurred while fetching data. Using default content.", error);
   content = defaultContent;
 }
 
@@ -92,26 +123,35 @@ const navItems = [
       #mobile-menu {
         transition: transform 0.3s ease-in-out;
       }
+      .header-text-shadow {
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+      }
     </style>
   </head>
   <body class="bg-black text-white font-sans">
-    <div class="fixed inset-0 bg-black bg-opacity-10 z-[-1]"></div>
 
     <div class="relative z-1">
       <!-- HEADER -->
-      <header class="bg-black bg-opacity-80 backdrop-blur-md fixed w-full z-50">
-        <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
-          <div class="flex items-center gap-3">
-            <img src="/images/logo.png" alt="Logo 501" class="h-28 w-28 rounded-full shadow-lg" />
-            <span class="text-2xl md:text-3xl font-logo text-yellow-400 tracking-wide">{content.header.title}</span>
+      <header class="bg-yellow-400 bg-opacity-20 backdrop-blur-md fixed w-full z-50">
+        <div class="max-w-6xl mx-auto flex items-center justify-between px-4">
+          <div class="flex items-center gap-4">
+            <img src="/images/logo.png" alt="Logo 501" class="h-28 w-28 rounded-full" />
+            <span class="text-3xl md:text-4xl font-logo text-white tracking-wide header-text-shadow">{content.header.title}</span>
           </div>
           <nav class="hidden md:flex space-x-6 font-gamberro text-lg text-white">
             {navItems.map(item => (
-              <a href={item.href} class="hover:text-yellow-400 transition-colors">{item.name}</a>
+              <a href={item.href} class="hover:text-yellow-400 transition-colors header-text-shadow">{item.name}</a>
             ))}
           </nav>
-          <button id="menu-button" class="md:hidden text-yellow-400">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button id="menu-button" class="md:hidden text-white">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"  style="filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.7));">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
@@ -130,7 +170,7 @@ const navItems = [
 
       <!-- HERO -->
       <main>
-        <section id="hero" class="pt-40 md:pt-48 bg-black bg-opacity-70 flex flex-col items-center text-center px-4">
+        <section id="hero" class="pt-32 md:pt-36 bg-black bg-opacity-50 flex flex-col items-center text-center px-4">
           <h2 class="text-5xl md:text-6xl font-gamberro text-white mb-4 md:mb-6 transition-colors hover:text-yellow-400" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
             {content.hero.title}
           </h2>
@@ -141,7 +181,7 @@ const navItems = [
         </section>
 
         <!-- ABOUT -->
-        <section id="about-us" class="py-10 px-4 bg-black bg-opacity-40">
+        <section id="about-us" class="py-10 px-4 bg-black bg-opacity-30">
           <h3 class="text-4xl font-bold text-center mb-12 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.about.title}</h3>
           <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8">
             <div class="md:w-1/2">
@@ -154,7 +194,7 @@ const navItems = [
         </section>
 
         <!-- GALLERY -->
-        <section id="gallery" class="py-10 px-4 bg-black bg-opacity-30">
+        <section id="gallery" class="py-10 px-4 bg-black bg-opacity-20">
           <h3 class="text-4xl font-bold text-center mb-12 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.gallery.title}</h3>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {content.gallery.images.map(image => (
@@ -166,18 +206,19 @@ const navItems = [
         </section>
 
         <!-- EVENTS -->
-        <section id="events" class="py-10 px-4 bg-gray-900 bg-opacity-50">
-          <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.events.title}</h3>
-          <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section id="events" class="py-10 bg-gray-900 bg-opacity-40 overflow-hidden">
+          <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400 font-gamberro px-4">{content.events.title}</h3>
+          <div class="flex space-x-6 md:space-x-8 overflow-x-auto pb-6 hide-scrollbar px-4 md:px-8">
             {content.events.list.map(event => (
-              <div class="bg-gray-800 bg-opacity-90 p-6 rounded-lg">
+              <div class="flex-shrink-0 w-80 md:w-96 bg-gray-800 bg-opacity-90 p-6 rounded-lg shadow-lg">
                 <h4 class="text-2xl font-bold mb-2 transition-colors duration-300 hover:text-yellow-400">{event.title}</h4>
-                <p class="text-yellow-400 mb-4">{event.schedule}</p>
-                <p class="transition-colors duration-300 hover:text-yellow-400">{event.description}</p>
+                <p class="text-yellow-400 mb-4 font-semibold">{event.schedule}</p>
+                <p class="text-gray-300 transition-colors duration-300 hover:text-white">{event.description}</p>
               </div>
             ))}
           </div>
         </section>
+
       </main>
 
       <!-- FOOTER -->

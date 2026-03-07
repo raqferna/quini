@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAcldQYjIqVD3BPwRyzocfDTE3Cktxos4s",
@@ -15,5 +16,6 @@ const firebaseConfig = {
 // This pattern prevents re-initializing the app on the server.
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { db };
+export { db, storage };
