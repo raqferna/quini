@@ -1,4 +1,3 @@
-
 ---
 import { db } from '../lib/firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
@@ -6,11 +5,12 @@ import { doc, getDoc } from 'firebase/firestore';
 // Define image paths
 const dianaImageUrl = '/images/diana.png';
 
-// Define a complete, default structure for the content
+// Contenido por defecto
 const defaultContent = {
-  site: { title: "Mi Sitio Web" },
-  header: { title: "Mi Negocio", nav: [] },
+  site: { title: "Cerveceria 501" },
+  header: { title: "Cerveceria 501" },
   hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble" },
+  about: { title: "Sobre Nosotros", text: "Nacimos de la locura y las ganas de pasarlo bien. Somos más que un bar: somos tu punto de encuentro, tu segunda casa, el lugar donde las anécdotas nacen y las noches se vuelven legendarias. Con la mejor música, un ambiente que te atrapa y una familia que no para de crecer, te invitamos a ser parte de nuestra historia. ¿Te apuntas a la próxima aventura?"},
   gallery: { title: "Galería", images: [] },
   events: { title: "Eventos", list: [] },
   footer: { title: "Contacto", address: "", schedule: "", social: [] }
@@ -28,11 +28,11 @@ try {
       site: { ...defaultContent.site, ...remoteData.site },
       header: { ...defaultContent.header, ...remoteData.header },
       hero: { ...defaultContent.hero, ...remoteData.hero },
+      about: { ...defaultContent.about, ...remoteData.about },
       gallery: { ...defaultContent.gallery, ...remoteData.gallery },
       events: { ...defaultContent.events, ...remoteData.events },
       footer: { ...defaultContent.footer, ...remoteData.footer },
-    }
-    if (!Array.isArray(content.header.nav)) content.header.nav = [];
+    };
     if (!Array.isArray(content.gallery.images)) content.gallery.images = [];
     if (!Array.isArray(content.events.list)) content.events.list = [];
     if (!Array.isArray(content.footer.social)) content.footer.social = [];
@@ -40,16 +40,20 @@ try {
     console.log("No such document! Using default content.");
   }
 } catch (error) {
-    console.error("Failed to fetch data from Firestore. Using default content.", error);
-    content = defaultContent;
+  console.error("Failed to fetch data from Firestore. Using default content.", error);
+  content = defaultContent;
 }
 
-// Filter out the 'Sobre Nosotros' link from navigation
-const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros');
+// Navegación
+const navItems = [
+  { name: "Galería", href: "#gallery" },
+  { name: "Eventos", href: "#events" },
+  { name: "Contacto", href: "#contact" }
+];
+---
 
---- 
 <html lang="es">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{content.site.title}</title>
@@ -57,7 +61,7 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Permanent+Marker&display=swap" rel="stylesheet">
     <style define:vars={{ bgImage: `url(${dianaImageUrl})` }}>
       body {
         background-image: var(--bgImage);
@@ -65,11 +69,11 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
         background-attachment: fixed;
         background-position: center;
       }
-    </style>
-    <style>
-      .font-logo {
-        font-family: 'Lobster', cursive;
+      html {
+        scroll-behavior: smooth;
       }
+      .font-logo { font-family: 'Lobster', cursive; }
+      .font-gamberro { font-family: 'Permanent Marker', cursive; }
       .gallery-item-container {
         overflow: hidden;
         border-radius: 0.5rem;
@@ -85,81 +89,127 @@ const navItems = content.header.nav.filter(item => item.name !== 'Sobre Nosotros
       .gallery-item-container:hover .gallery-image {
         transform: scale(1.1);
       }
-      .header-logo {
-        mix-blend-mode: screen; /* This will help blend the logo with the background */
+      #mobile-menu {
+        transition: transform 0.3s ease-in-out;
       }
     </style>
-</head>
-<body class="bg-black text-white font-sans">
-    <div class="fixed inset-0 bg-black bg-opacity-30 z-[-1]"></div>
+  </head>
+  <body class="bg-black text-white font-sans">
+    <div class="fixed inset-0 bg-black bg-opacity-10 z-[-1]"></div>
 
     <div class="relative z-1">
-        <header class="p-4 flex justify-between items-center">
-            <a href="/" aria-label="Volver al inicio">
-                <img 
-                    src="/images/logo.png" 
-                    alt={content.header.title} 
-                    class="h-20 transition-all duration-300 hover:opacity-80 hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.7)] header-logo"
-                />
-            </a>
-            <nav>
-                {navItems.map(item => (
-                    <a href={item.href} class="mx-2 hover:text-yellow-400 transition-colors duration-300">{item.name}</a>
-                ))}
-            </nav>
-        </header>
+      <!-- HEADER -->
+      <header class="bg-black bg-opacity-80 backdrop-blur-md fixed w-full z-50">
+        <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
+          <div class="flex items-center gap-3">
+            <img src="/images/logo.png" alt="Logo 501" class="h-28 w-28 rounded-full shadow-lg" />
+            <span class="text-2xl md:text-3xl font-logo text-yellow-400 tracking-wide">{content.header.title}</span>
+          </div>
+          <nav class="hidden md:flex space-x-6 font-gamberro text-lg text-white">
+            {navItems.map(item => (
+              <a href={item.href} class="hover:text-yellow-400 transition-colors">{item.name}</a>
+            ))}
+          </nav>
+          <button id="menu-button" class="md:hidden text-yellow-400">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+      
+      <!-- MOBILE MENU (HIDDEN BY DEFAULT) -->
+      <div id="mobile-menu" class="fixed top-0 right-0 h-full w-64 bg-black bg-opacity-90 backdrop-blur-lg z-50 transform translate-x-full">
+        <nav class="flex flex-col items-center justify-center h-full space-y-8 font-gamberro text-2xl text-white">
+          {navItems.map(item => (
+            <a href={item.href} class="hover:text-yellow-400 transition-colors mobile-menu-link">{item.name}</a>
+          ))}
+        </nav>
+      </div>
 
-        <main>
-            <section id="hero" class="py-64 flex items-center justify-center text-center">
-                <div>
-                    <h2 class="text-6xl font-extrabold text-white transition-colors duration-300 hover:text-yellow-400" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{content.hero.title}</h2>
-                    <p class="text-xl mt-4 max-w-2xl mx-auto transition-colors duration-300 hover:text-yellow-400 text-center">{content.hero.subtitle}</p>
-                </div>
-            </section>
 
-            <section id="gallery" class="py-20 px-4 bg-black bg-opacity-30">
-                <h3 class="text-4xl font-bold text-center mb-12 transition-colors duration-300 hover:text-yellow-400">{content.gallery.title}</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {content.gallery.images.map(image => (
-                        <div class="gallery-item-container">
-                            <img 
-                                src={image} 
-                                alt={`Galería de ${content.site.title}`} 
-                                class="gallery-image"
-                            />
-                        </div>
-                    ))}
-                </div>
-            </section>
+      <!-- HERO -->
+      <main>
+        <section id="hero" class="pt-40 md:pt-48 bg-black bg-opacity-70 flex flex-col items-center text-center px-4">
+          <h2 class="text-5xl md:text-6xl font-gamberro text-white mb-4 md:mb-6 transition-colors hover:text-yellow-400" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+            {content.hero.title}
+          </h2>
+          <p class="text-lg md:text-2xl text-gray-300 mb-8 max-w-3xl">{content.hero.subtitle}</p>
+          <a href="#events" class="bg-yellow-400 text-gray-900 font-gamberro text-2xl px-8 py-3 rounded-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-300 shadow-lg">
+            Ver Eventos
+          </a>
+        </section>
 
-            <section id="events" class="py-20 px-4 bg-gray-900 bg-opacity-50">
-                <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400">{content.events.title}</h3>
-                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {content.events.list.map(event => (
-                        <div class="bg-gray-800 bg-opacity-90 p-6 rounded-lg">
-                            <h4 class="text-2xl font-bold mb-2 transition-colors duration-300 hover:text-yellow-400">{event.title}</h4>
-                            <p class="text-yellow-400 mb-4">{event.schedule}</p>
-                            <p class="transition-colors duration-300 hover:text-yellow-400">{event.description}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-        </main>
+        <!-- ABOUT -->
+        <section id="about-us" class="py-10 px-4 bg-black bg-opacity-40">
+          <h3 class="text-4xl font-bold text-center mb-12 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.about.title}</h3>
+          <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8">
+            <div class="md:w-1/2">
+              <img src="/images/about.jpg" alt="Sobre Nosotros" class="rounded-lg shadow-lg w-full" />
+            </div>
+            <div class="md:w-1/2">
+              <p class="text-lg text-left transition-colors duration-300 hover:text-yellow-400">{content.about.text}</p>
+            </div>
+          </div>
+        </section>
 
-        <footer id="contact" class="bg-gray-900 bg-opacity-50 py-10 px-4 text-center">
-            <h3 class="text-3xl font-bold mb-4 transition-colors duration-300 hover:text-yellow-400">{content.footer.title}</h3>
-            <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.address}</p>
-            <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.schedule}</p>
-            <p class="mb-4">
-                Síguenos en 
-                {content.footer.social.map((link, index) => (
-                    <>
-                        <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-yellow-400 hover:underline">{link.name}</a>
-                        {index < content.footer.social.length - 1 && ' y '}
-                    </>
-                ))}
-            </p>
-        </footer>
+        <!-- GALLERY -->
+        <section id="gallery" class="py-10 px-4 bg-black bg-opacity-30">
+          <h3 class="text-4xl font-bold text-center mb-12 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.gallery.title}</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {content.gallery.images.map(image => (
+              <div class="gallery-item-container">
+                <img src={image} alt={`Galería de ${content.site.title}`} class="gallery-image" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- EVENTS -->
+        <section id="events" class="py-10 px-4 bg-gray-900 bg-opacity-50">
+          <h3 class="text-4xl font-bold text-center mb-8 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.events.title}</h3>
+          <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            {content.events.list.map(event => (
+              <div class="bg-gray-800 bg-opacity-90 p-6 rounded-lg">
+                <h4 class="text-2xl font-bold mb-2 transition-colors duration-300 hover:text-yellow-400">{event.title}</h4>
+                <p class="text-yellow-400 mb-4">{event.schedule}</p>
+                <p class="transition-colors duration-300 hover:text-yellow-400">{event.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <!-- FOOTER -->
+      <footer id="contact" class="bg-gray-900 bg-opacity-50 py-8 px-4 text-center">
+        <h3 class="text-3xl font-bold mb-4 transition-colors duration-300 hover:text-yellow-400 font-gamberro">{content.footer.title}</h3>
+        <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.address}</p>
+        <p class="mb-2 transition-colors duration-300 hover:text-yellow-400">{content.footer.schedule}</p>
+        <p class="mb-4">
+          Síguenos en 
+          {content.footer.social.map((link, index) => (
+            <span key={index}>
+              <a href={link.url} target="_blank" rel="noopener noreferrer" class="text-yellow-400 hover:underline">{link.name}</a>
+              {index < content.footer.social.length - 1 ? ' y ' : ''}
+            </span>
+          ))}
+        </p>
+      </footer>
     </div>
-</body>
+    <script>
+      const menuButton = document.getElementById('menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuLinks = document.querySelectorAll('.mobile-menu-link');
+
+      menuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('translate-x-full');
+      });
+
+      menuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('translate-x-full');
+        });
+      });
+    </script>
+  </body>
 </html>
