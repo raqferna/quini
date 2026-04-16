@@ -37,6 +37,10 @@ The project implements an automated deployment workflow to ensure content change
 *   **Problem:** The `triggerPublish` Cloud Function was failing with a `401 Bad Credentials` error, preventing the automated deployment from starting.
 *   **Solution:** The issue was traced to an incorrect or corrupted GitHub Personal Access Token (PAT) in Google Secret Manager. The problem was resolved by systematically regenerating the PAT with the correct `repo` scope, carefully updating it in Secret Manager, and adding diagnostic logging to the function to confirm the correct token was being loaded.
 
-### 3.2. **Current Request:** Fix Dynamic Image Gallery
+### 3.2. **Resolved:** Fix Dynamic Image Gallery
 *   **Problem:** The image gallery was not displaying all images. Images were organized into multiple subdirectories within the `gallery/` path in Firebase Storage, but only images from some directories were appearing.
 *   **Solution Implemented:** The recursive function `getAllImageUrls` in `src/pages/index.astro`, which is responsible for fetching images from Firebase Storage, has been enhanced with detailed diagnostic logging. It now prints a trace of its execution path to the console during the build process (`npm run dev`), showing which folders it explores and how many images it finds in each. This allows the user to check the terminal output and quickly identify if any directories are not being accessed, likely due to permission issues in Firebase Storage.
+
+### 3.3. **Current Request:** Refactor Content Structure
+*   **Problem:** The default content structure in `src/pages/index.astro` and `src/lib/content-structure.json` were out of sync.
+*   **Solution Implemented:** The `defaultContent` variable in `src/pages/index.astro` and the content of `src/lib/content-structure.json` have been updated to a simpler, consistent structure. The `__index.astro` file, which was causing confusion, has been deleted. The plan is now to deploy these changes.
