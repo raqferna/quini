@@ -10,33 +10,56 @@ const dianaImageUrl = '/images/diana.png';
 const defaultContent = {
   site: { title: "Cerveceria 501" },
   header: { title: "Cerveceria 501" },
-  hero: { title: "Bienvenido", subtitle: "Un subtítulo increíble" },
-  about: { title: "Sobre Nosotros", text: "Nacimos de la locura y las ganas de pasarlo bien. Somos más que un bar: somos tu punto de encuentro, tu segunda casa, el lugar donde las anécdotas nacen y las noches se vuelven legendarias. Con la mejor música, un ambiente que te atrapa y una familia que no para de crecer, te invitamos a ser parte de nuestra historia. ¿Te apuntas a la próxima aventura?"},
+  hero: { title: "Bienvenido", subtitle: "U" },
+  about: { title: "Sobre Nosotros", text: ""},
   gallery: { title: "Galería", images: [] },
-  events: { title: "Eventos", list: [{title: "Noche de Trivia", schedule: "Todos los jueves, 21:00h", description: "Pon a prueba tus conocimientos y gana premios increíbles."}, {title: "Concierto Acústico", schedule: "Sábado 25, 22:30h", description: "Disfruta de la mejor música en directo con artistas locales."}, {title: "Fiesta de los 80", schedule: "Viernes 31, 23:00h", description: "Vuelve a la década de los 80 con los mejores hits y disfraces."}] },
+  events: { title: "Eventos", list: [] },
   footer: { title: "Contacto", address: "", schedule: "", social: [] }
 };
 
 let content = defaultContent;
 
-// --- Recursive function to get all files from a folder and its subfolders ---
-async function getAllImageUrls(folderRef) {
+// --- Versión mejorada con registros de diagnóstico ---
+async function getAllImageUrls(folderRef, level = 0) {
     let imageUrls = [];
+    const indent = "  ".repeat(level);
+    console.log(`${indent}🔍 Explorando en: ${folderRef.fullPath}`);
+    
     try {
         const res = await listAll(folderRef);
-        const urlPromises = res.items.map(itemRef => getDownloadURL(itemRef));
-        const urls = await Promise.all(urlPromises);
-        imageUrls.push(...urls);
-
-        for (const prefixRef of res.prefixes) {
-            const subfolderUrls = await getAllImageUrls(prefixRef);
-            imageUrls.push(...subfolderUrls);
+        
+        // Procesa los archivos en la carpeta actual
+        if (res.items.length > 0) {
+            console.log(`${indent}  - Encontradas ${res.items.length} imagen(es) aquí.`);
+            const urlPromises = res.items.map(itemRef => getDownloadURL(itemRef));
+            const urls = await Promise.all(urlPromises);
+            imageUrls.push(...urls);
+        } else {
+            console.log(`${indent}  - No se encontraron imágenes en esta carpeta.`);
         }
+
+        // Procesa las subcarpetas de forma recursiva
+        if (res.prefixes.length > 0) {
+            console.log(`${indent}  - Encontradas ${res.prefixes.length} subcarpeta(s). Analizando...`);
+            for (const prefixRef of res.prefixes) {
+                const subfolderUrls = await getAllImageUrls(prefixRef, level + 1);
+                imageUrls.push(...subfolderUrls);
+            }
+        } else {
+             console.log(`${indent}  - No se encontraron más subcarpetas.`);
+        }
+
     } catch (error) {
-        console.error(`Error listing images in ${folderRef.fullPath}:`, error);
+        console.error(`${indent}❌ Error explorando ${folderRef.fullPath}:`, error);
     }
+    
+    if (level === 0) {
+        console.log(`✅ Exploración completada. Se encontraron un total de ${imageUrls.length} imágenes.`);
+    }
+
     return imageUrls;
 }
+
 
 try {
   // Fetch content from Firestore
@@ -63,12 +86,14 @@ try {
   }
 
   // Fetch images from Firebase Storage
+  console.log("--- Iniciando la búsqueda de imágenes en Firebase Storage ---");
   const galleryRootRef = ref(storage, 'gallery');
   const imageUrls = await getAllImageUrls(galleryRootRef);
   
   if (imageUrls.length > 0) {
     content.gallery.images = imageUrls;
   }
+  console.log("--- Búsqueda de imágenes finalizada. ---");
 
 } catch (error) {
   console.error("A critical error occurred while fetching data. Using default content.", error);
@@ -215,7 +240,7 @@ const navItems = [
                 <p class="text-yellow-400 mb-4 font-semibold">{event.schedule}</p>
                 <p class="text-gray-300 transition-colors duration-300 hover:text-white">{event.description}</p>
               </div>
-            ))}
+            ))}\
           </div>
         </section>
 

@@ -1,55 +1,42 @@
-# Blueprint: Cervecería 501 - Sitio Web Oficial
+# Blueprint: Cerveceria 501 - Astro.js Website
 
-## Visión General
+## 1. Project Overview
 
-Crear una página web estática, inmersiva y de una sola página para la "Cervecería 501". El sitio está diseñado para capturar la energía y el ambiente único del bar, utilizando un diseño moderno y audaz, y está gestionado a través de Firebase para permitir actualizaciones de contenido dinámicas y sencillas.
+This project is a modern, visually appealing, and content-focused website for "Cerveceria 501". It is built with Astro.js, emphasizing performance and a server-first approach. The site's content is designed to be fully dynamic, managed by an external CRM system and updated on the live site via a CI/CD pipeline.
 
-## Arquitectura de Contenido (CMS)
+## 2. Project Outline & Features
 
-El sitio utiliza una arquitectura de contenido desacoplada (headless) con Firebase, separando los datos de la presentación:
+### 2.1. Core Technology
+*   **Framework:** Astro.js
+*   **Styling:** A modern, clean design implemented with utility-first CSS (like Tailwind CSS) and custom styles.
+*   **Content Backend:** Firestore is used as the database to store website content.
+*   **Image Backend:** Firebase Storage is used to host all website images, particularly for the gallery.
+*   **Content Management:** An external CRM application (Next.js) is used to edit and manage the content and images.
 
-*   **Firebase Firestore:** Actúa como el CMS principal para todo el contenido de texto. Un único documento (`content/pageData`) almacena los textos del hero, la sección "Sobre Nosotros", la lista de eventos y la información del footer. Esto permite al equipo del bar actualizar la información en tiempo real sin tocar el código.
+### 2.2. Website Structure & Content
+The website content is fetched from Firestore at build time. It includes the following sections:
+*   **Site-wide:** `site.title`
+*   **Header:** `header.title`
+*   **Hero Section:** `hero.title`, `hero.subtitle`
+*   **About Us:** `about.title`, `about.text`
+*   **Image Gallery:** `gallery.title`. The images (`gallery.images`) are loaded dynamically by recursively scanning the `/gallery` directory in Firebase Storage.
+*   **Events:** `events.title`, `events.list`
+*   **Footer:** `footer.title`, `footer.address`, `footer.schedule`, `footer.social` links.
 
-*   **Firebase Storage:** Se utiliza para gestionar todas las imágenes de la galería. Las imágenes se suben a la carpeta `/gallery` y el sitio las obtiene dinámicamente. Gracias a una función de búsqueda recursiva, las imágenes pueden organizarse en subcarpetas dentro de `/gallery` para una mejor organización, y el sitio las encontrará igualmente.
+### 2.3. Deployment & CI/CD Pipeline
+The project implements an automated deployment workflow to ensure content changes from the CRM are reflected on the live website instantly.
+1.  **Trigger:** An editor saves new content in the external CRM.
+2.  **Webhook:** The CRM calls a Firebase Cloud Function (`triggerPublish`).
+3.  **Dispatch:** The Cloud Function sends a `repository_dispatch` event to the Astro website's GitHub repository (`raqferna/quini`), authenticated via a GitHub PAT stored securely in Google Secret Manager.
+4.  **CI/CD:** A GitHub Action workflow listens for the `repository_dispatch` event.
+5.  **Build & Deploy:** The GitHub Action builds the Astro site (pulling content from Firestore and images from Storage) and deploys the static output to its hosting environment.
 
-## Esquema del Proyecto
+## 3. Change History & Implemented Solutions
 
-### Estilo y Diseño
+### 3.1. **Resolved:** CI/CD Pipeline Authentication
+*   **Problem:** The `triggerPublish` Cloud Function was failing with a `401 Bad Credentials` error, preventing the automated deployment from starting.
+*   **Solution:** The issue was traced to an incorrect or corrupted GitHub Personal Access Token (PAT) in Google Secret Manager. The problem was resolved by systematically regenerating the PAT with the correct `repo` scope, carefully updating it in Secret Manager, and adding diagnostic logging to the function to confirm the correct token was being loaded.
 
-*   **Paleta de Colores:** Una base de tonos oscuros (negro y grises) que crea un ambiente íntimo, contrastada con un **amarillo vibrante** para llamadas a la acción, enlaces y efectos hover, generando un look enérgico y memorable.
-*   **Tipografía:**
-    *   **Fuente Logo (`Lobster`):** Utilizada para el nombre "Cervecería 501" en la cabecera, aportando un toque estilizado y reconocible.
-    *   **Fuente Títulos (`Permanent Marker`):** Aplicada a los títulos de sección y a la navegación, esta fuente de estilo "escrito a mano" unifica el diseño con una estética audaz y rebelde.
-*   **Header Fijo y Translúcido:** La cabecera se mantiene fija en la parte superior, con un fondo amarillo muy sutil y translúcido (`bg-yellow-400 bg-opacity-20`) y un efecto de desenfoque (`backdrop-blur-md`). Esto permite que la imagen de fondo se vea a través, integrando la cabecera en el diseño inmersivo.
-*   **Legibilidad del Header:** Para asegurar una legibilidad perfecta del texto blanco sobre el fondo claro del header, se ha aplicado una sombra de texto (`text-shadow`), que crea un contorno sutil y efectivo.
-*   **Fondo Inmersivo:** Una imagen de fondo (`diana.png`) cubre toda la página y permanece estática (`background-attachment: fixed`), creando un efecto de profundidad. Una superposición oscura general asegura la legibilidad del contenido en todas las secciones.
-
-### Características y Funcionalidad
-
-*   **Página Única (Single-Page):** Toda la información se presenta en una sola página con scroll vertical. La navegación del header desplaza suavemente al usuario a la sección correspondiente.
-*   **Diseño Responsivo y Móvil:** El diseño se adapta perfectamente a cualquier tamaño de pantalla.
-    *   **Menú Móvil Funcional:** En dispositivos móviles, un menú de hamburguesa deslizable desde la derecha (`translate-x-full`) proporciona una navegación limpia y funcional.
-*   **Galería Dinámica desde Firebase Storage:**
-    *   Las imágenes se cargan automáticamente desde la carpeta `/gallery` en Firebase Storage.
-    *   El código utiliza una función **recursiva** con `listAll` para buscar imágenes en `/gallery` y todas sus subcarpetas, ofreciendo flexibilidad en la organización de archivos.
-    *   Las URLs de descarga se generan dinámicamente, y la galería se renderiza en el lado del servidor (`server-side rendering`) por Astro.
-*   **Carrusel de Eventos Horizontal:**
-    *   La sección de eventos se presenta como un carrusel horizontal deslizable, ideal para la navegación táctil en dispositivos móviles.
-    *   Utiliza `flex` y `overflow-x-auto` para crear el contenedor deslizable.
-    *   Las tarjetas de evento tienen un ancho fijo (`flex-shrink-0`) para mantener un tamaño consistente durante el scroll.
-    *   La barra de desplazamiento horizontal está oculta mediante CSS (`.hide-scrollbar`) para una apariencia más limpia y nativa.
-*   **Configuración de Acceso a Storage:**
-    *   **CORS:** Se ha configurado una política de CORS (`cors.json`) en el bucket para permitir que el navegador solicite las imágenes desde el dominio del sitio web.
-    *   **Reglas de Seguridad:** Se han establecido reglas específicas y seguras en Firebase Storage para permitir la lectura pública (`allow read`) **únicamente** en la carpeta `/gallery`, manteniendo el resto del bucket privado.
-
-## Plan y Estado Actual
-
-*   **Implementación de Diseño Inmersivo:** **(Completado)**
-*   **Integración de Contenido con Firestore:** **(Completado)**
-*   **Creación del Header Fijo con Logo Grande:** **(Completado)**
-*   **Implementación del Menú Móvil Funcional:** **(Completado)**
-*   **Integración de Galería Dinámica con Firebase Storage:** **(Completado)**
-*   **Creación del Carrusel de Eventos Horizontal:** **(Completado)**
-*   **Configuración de CORS y Reglas de Seguridad de Storage:** **(Completado)**
-
-**El proyecto se encuentra en un estado estable y funcional. Todas las tareas planificadas han sido completadas.**
+### 3.2. **Current Request:** Fix Dynamic Image Gallery
+*   **Problem:** The image gallery was not displaying all images. Images were organized into multiple subdirectories within the `gallery/` path in Firebase Storage, but only images from some directories were appearing.
+*   **Solution Implemented:** The recursive function `getAllImageUrls` in `src/pages/index.astro`, which is responsible for fetching images from Firebase Storage, has been enhanced with detailed diagnostic logging. It now prints a trace of its execution path to the console during the build process (`npm run dev`), showing which folders it explores and how many images it finds in each. This allows the user to check the terminal output and quickly identify if any directories are not being accessed, likely due to permission issues in Firebase Storage.
